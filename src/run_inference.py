@@ -315,11 +315,6 @@ def main():
     # Load Model
     model = load_model(CHECKPOINT_PATH, PARAMS_PATH, device)
 
-    # =================================================================
-    # COMPUTE NORMALIZED METRICS (using validate_one_epoch for consistency)
-    # =================================================================
-    # Use the same method as was used to calculate NAIVE_MAE_TEST
-    # This ensures MASE is calculated correctly (same averaging approach)
     print("\n Computing Normalized Metrics (same method as Naive)...")
     _, mae_norm, rmse_norm = validate_one_epoch(
         model=model,
