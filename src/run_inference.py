@@ -28,7 +28,7 @@ from .config import LOOKBACK, HORIZON, TARGET_IDX, NAIVE_MAE_TEST, PREPROCESS_CO
 from .config.training_config import TARGET_COL
 from .PreProcessing import Preprocesser
 from .DataLoading import create_test_loader
-from .Training.engine import create_model
+from .Training.engine import create_model, validate_one_epoch
 from .Training.evaluation import evaluate_model
 from .Utils import set_seed, get_device, plot_test_predictions, plot_error_distribution
 
@@ -315,23 +315,20 @@ def main():
     # Load Model
     model = load_model(CHECKPOINT_PATH, PARAMS_PATH, device)
 
-    # Run Inference (NORMALIZED):
-    # We pass scaler=None to keep predictions in the 0-1 range.
-    # This is necessary to calculate MASE using the NAIVE_MAE_TEST constant (which is normalized).
-    print("\n Running Inference (Normalized)...")
-    predictions_norm, targets_norm = evaluate_model(
+    # =================================================================
+    # COMPUTE NORMALIZED METRICS (using validate_one_epoch for consistency)
+    # =================================================================
+    # Use the same method as was used to calculate NAIVE_MAE_TEST
+    # This ensures MASE is calculated correctly (same averaging approach)
+    print("\n Computing Normalized Metrics (same method as Naive)...")
+    _, mae_norm, rmse_norm = validate_one_epoch(
         model=model,
-        val_loader=test_loader,
+        dataloader=test_loader,
+        loss_fn=torch.nn.MSELoss(),
         device=device,
-        scaler=None,  # No scaler -> output remains normalized
-        target_idx=None,
     )
-    print(f"   Predictions shape: {predictions_norm.shape}")
-    print(f"   Targets shape: {targets_norm.shape}")
-
-    # Compute Metrics (NORMALIZED)
-    print("\n Computing Metrics...")
-    metrics_norm = calculate_metrics(predictions_norm, targets_norm, NAIVE_MAE_TEST)
+    mase = mae_norm / NAIVE_MAE_TEST
+    metrics_norm = {"MAE": mae_norm, "RMSE": rmse_norm, "MASE": mase}
 
     # Run Inference (DENORMALIZED):
     # We pass the scaler to transform predictions back to real units (Watts).
@@ -372,7 +369,7 @@ def main():
         "model_name": MODEL_NAME,
         "checkpoint": CHECKPOINT_PATH,
         "test_path": TEST_DATA_PATH,
-        "n_samples": len(predictions_norm),
+        "n_samples": len(predictions_denorm),
         "metrics_normalized": metrics_norm,
         "metrics_denormalized": {
             "MAE": metrics_denorm["MAE"],
