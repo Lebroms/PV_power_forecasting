@@ -131,7 +131,7 @@ def evaluate_model(wrapper, val_loader, scaler, device, fold_idx, model_name):
     targets_flat = np.concatenate(all_targets)
 
     # --- Denormalization for Plotting ---
-    # We need to invert the scaling to get real units (Watts).
+    # We need to invert the scaling to get real units (kW).
     # Since scaler expects shape (N, n_features), we create dummy arrays
     # and fill only the target column.
     n_features = scaler.n_features_in_

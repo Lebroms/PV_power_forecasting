@@ -258,7 +258,7 @@ def main():
     5. Loads the trained model architecture and weights.
     6. Runs inference TWICE:
        - First on NORMALIZED data (to calculate MASE comparable with validation).
-       - Second on DENORMALIZED data (to get Real World metrics in Watts).
+       - Second on DENORMALIZED data (to get Real World metrics in kW).
     7. Computes and prints metrics (MAE, RMSE, MASE).
     8. Generates plots for visual inspection.
     9. Saves all results to a JSON file.
@@ -326,7 +326,7 @@ def main():
     metrics_norm = {"MAE": mae_norm, "RMSE": rmse_norm, "MASE": mase}
 
     # Run Inference (DENORMALIZED):
-    # We pass the scaler to transform predictions back to real units (Watts).
+    # We pass the scaler to transform predictions back to real units (kW).
     # This gives us interpretable errors.
     predictions_denorm, targets_denorm = evaluate_model(
         model=model,
@@ -351,9 +351,9 @@ def main():
     else:
         print("MASE: N/A")
 
-    print("\n--- DENORMALIZED Metrics (Watts) ---")
-    print(f"MAE:  {metrics_denorm['MAE']:.2f} W")
-    print(f"RMSE: {metrics_denorm['RMSE']:.2f} W")
+    print("\n--- DENORMALIZED Metrics (kW) ---")
+    print(f"MAE:  {metrics_denorm['MAE']:.2f} kW")
+    print(f"RMSE: {metrics_denorm['RMSE']:.2f} kW")
     print("=" * 60)
 
     # Save Results to JSON

@@ -11,7 +11,7 @@ def evaluate_model(model, val_loader, device, scaler=None, target_idx=None):
 
     It is used at the END of training (or during inference) to:
     1. Collect all predictions.
-    2. Denormalize them back to real units (Watts) if a scaler is provided.
+    2. Denormalize them back to real units (kW) if a scaler is provided.
     3. Enable plotting and detailed error analysis.
 
     Args:
@@ -24,7 +24,7 @@ def evaluate_model(model, val_loader, device, scaler=None, target_idx=None):
     Returns:
         tuple: (all_preds, all_targets)
                - If scaler is None: Normalized values (0-1).
-               - If scaler is provided: Values in original units (Watts).
+               - If scaler is provided: Values in original units (kW).
     """
     model.eval()
     all_preds = []
@@ -55,7 +55,7 @@ def evaluate_model(model, val_loader, device, scaler=None, target_idx=None):
     all_preds = np.maximum(all_preds, 0)
 
     # Optional Denormalization
-    # If the scaler is provided, we convert the predictions back to the original scale (Watts).
+    # If the scaler is provided, we convert the predictions back to the original scale (kW).
     # This is crucial because metrics like MAE should be interpretable in the real world.
     if scaler is not None and target_idx is not None:
         # The MinMaxScaler formula is: X_scaled = (X - X_min) / (X_max - X_min)

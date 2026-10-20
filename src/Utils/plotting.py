@@ -97,7 +97,7 @@ def plot_predictions(preds, targets, model_name, fold_idx, save_dir):
     ax.plot(hours, preds_plot, label="Predictions", alpha=0.8, linewidth=1.5)
 
     ax.set_xlabel("Hours")
-    ax.set_ylabel("PV Power (W)")
+    ax.set_ylabel("PV Power (kW)")
     ax.set_title(f"{model_name} - Fold {fold_idx + 1} - Predictions vs Ground Truth")
     ax.legend()
     ax.grid(True, alpha=0.3)
