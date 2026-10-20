@@ -2,31 +2,31 @@
 
 A comprehensive **Time Series Forecasting** pipeline for predicting Photovoltaic (PV) power generation 24 hours ahead. This project implements state-of-the-art deep learning architectures, **Self-Supervised Pre-training** via Masked Autoencoders, **Transfer Learning**, and **Bayesian Hyperparameter Optimization** with Optuna.
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange.svg)
 
 ---
 
 ## Table of Contents
 
-- [Problem Definition](#-problem-definition)
-- [Key Features](#-key-features)
-- [Project Structure](#-project-structure)
-- [Data Pipeline](#-data-pipeline)
-- [Exploratory Data Analysis](#-exploratory-data-analysis)
-- [Preprocessing](#-preprocessing)
-- [Data Loading](#-data-loading)
-- [Model Architectures](#-model-architectures)
-- [Self-Supervised Pre-training](#-self-supervised-pre-training)
-- [Training & Optimization](#-training--optimization)
-- [Evaluation Metrics](#-evaluation-metrics)
-- [Baselines](#-baselines)
-- [Inference](#-inference)
-- [Results](#-results)
-- [Usage](#-usage)
-- [Configuration](#-configuration)
-- [Notebooks](#-notebooks)
-- [Installation](#-installation)
+- [Problem Definition](#problem-definition)
+- [Key Features](#key-features)
+- [Project Structure](#project-structure)
+- [Data Pipeline](#data-pipeline)
+- [Exploratory Data Analysis](#exploratory-data-analysis)
+- [Preprocessing](#preprocessing)
+- [Data Loading](#data-loading)
+- [Model Architectures](#model-architectures)
+- [Self-Supervised Pre-training](#self-supervised-pre-training)
+- [Training & Optimization](#training--optimization)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Baselines](#baselines)
+- [Inference](#inference)
+- [Results](#results)
+- [Configuration](#configuration)
+- [Notebooks](#notebooks)
+- [Installation](#installation)
+- [Team](#team)
 
 ---
 
@@ -34,11 +34,11 @@ A comprehensive **Time Series Forecasting** pipeline for predicting Photovoltaic
 
 ### Task: Day-Ahead PV Power Forecasting
 
-Given historical data, predict the **next 24 hours** of PV power production for a solar installation in **Sydney, Australia**.
+Given historical data, predict the **next 24 hours** of PV power production for a solar installation (82.41 kWp) in **New South Wales, Australia**.
 
 | Parameter | Value |
 |-----------|-------|
-| **Location** | Sydney, Australia (-33.87°, 151.21°) |
+| **Location** | New South Wales, Australia (weather data at -32.95°, 151.72°, near Newcastle) |
 | **Lookback Window** | 48 hours (selected via ablation study) |
 | **Forecast Horizon** | 24 hours (1 day ahead) |
 | **Resolution** | Hourly |
@@ -74,10 +74,10 @@ Output: Y = [y_{t+1}, y_{t+2}, ..., y_{t+24}]  → 24 timesteps × 1 target (pv_
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
-Progetto_deep_learning/
+PV_power_forecasting/
 │
 ├── 📁 data/
 │   ├── raw/                          # Original datasets
@@ -93,7 +93,7 @@ Progetto_deep_learning/
 │   ├── retrieve_study.ipynb          # Optuna study analysis & visualization
 │   └── uploading_test_data.ipynb     # Test data preparation
 │
-├── 📁 results/
+├── 📁 results/                       # Generated outputs (only optuna_studies.db is tracked)
 │   ├── checkpoints/                  # Trained model weights (.pth)
 │   ├── params/                       # Best hyperparameters (.json)
 │   ├── pretrained/                   # Pre-trained encoder weights
@@ -167,7 +167,7 @@ Progetto_deep_learning/
 
 | Dataset | Period | Rows | Purpose |
 |---------|--------|------|---------|
-| **Training** | Jul 2020 - Jun 2022 | 17,544 | Model training & validation |
+| **Training** | Jul 2010 - Jun 2012 | 17,544 | Model training & validation |
 | **Test** | Jul 2012 - Jun 2013 | 8,760 | Final evaluation |
 
 ---
@@ -272,8 +272,9 @@ Temporal Convolutional Network:
 - Dilated causal convolutions
 - Residual connections
 - Efficient parallelization
+- Evaluated with default hyperparameters only: it was the weakest model and was not tuned further
 
-### 4. PatchTST (`src/ModelClasses/patchtst.py`)
+### 4. PatchTST (`src/ModelClasses/PatchTST.py`)
 
 Patch Time Series Transformer (HuggingFace integration):
 - Segments the input into patches
@@ -460,7 +461,7 @@ NAIVE_MAE_TEST = 0.0624                        # Test set
 
 ### Additional Metrics
 - **MAE (Normalized)**: Mean Absolute Error on [0,1] scale
-- **MAE (Denormalized)**: MAE in Watts (interpretable)
+- **MAE (Denormalized)**: MAE in kW (interpretable)
 - **RMSE**: Root Mean Squared Error
 
 ---
@@ -513,7 +514,7 @@ python -m src.run_inference
 
 ---
 
-## 📈 Results
+## Results
 
 ### Test Set Performance
 
@@ -521,8 +522,10 @@ python -m src.run_inference
 |--------|-------|
 | **MASE** | 0.82 ✅ |
 | **MAE (Normalized)** | 0.051 |
-| **MAE (Watts)** | 3.54 W |
-| **RMSE (Watts)** | 7.14 W |
+| **MAE (kW)** | 3.55 kW |
+| **RMSE (kW)** | 7.26 kW |
+
+EncoderLSTM evaluated with `python -m src.run_inference` on the 8,689 forecast windows of the test year. A MASE of 0.82 means an 18% lower MAE than the 24-hour persistence baseline.
 
 ---
 
@@ -556,15 +559,15 @@ python -m src.run_inference
 ## Installation
 
 ### Requirements
-- Python 3.10+
+- Python 3.11+
 - PyTorch 2.0+
 - CUDA (optional, for GPU acceleration)
 
 ### Setup
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd Progetto_deep_learning
+git clone https://github.com/Lebroms/PV_power_forecasting.git
+cd PV_power_forecasting
 
 # Create virtual environment
 python -m venv .venv
@@ -574,6 +577,8 @@ source .venv/bin/activate  # Linux/Mac
 # Install dependencies
 pip install -r requirements.txt
 ```
+
+`requirements.txt` installs the default PyTorch build from PyPI. For a specific CUDA version, install PyTorch first following [pytorch.org](https://pytorch.org/get-started/locally/). The zero-shot evaluation with Chronos also needs `pip install chronos-forecasting`.
 
 ### Key Dependencies
 - `torch` - Deep Learning framework
@@ -586,11 +591,6 @@ pip install -r requirements.txt
 
 ---
 
-## Author
+## Team
 
-Deep Learning Project - PV Power Forecasting
-
-Federico Principi | Luca Scorza | Gianluca Barnaba
----
-
-*Last updated: January 2026*
+Team project for the course *Deep Learning* (MSc in Intelligent Systems Engineering, Università Campus Bio-Medico di Roma, 2025/26), developed by Federico Principi, Luca Scorza and Gianluca Barnaba.
