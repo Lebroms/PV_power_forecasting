@@ -14,9 +14,8 @@ dist/
 .DS_Store
 Thumbs.db
 
-# --- VS Code (ignora tutto tranne settings.json utile al team)
-.vscode/*
-!.vscode/settings.json
+# --- VS Code
+.vscode/
 
 # --- Excel temporanei
 ~$*

@@ -1,6 +1,0 @@
-{
-  "python.defaultInterpreterPath": ".venv", //dice a VS Code di usare l’interprete dentro .venv del progetto.
-  "python.terminal.activateEnvironment": true,
-  "python-envs.pythonProjects": [],
-  "python.languageServer": "Pylance" //quando apri un terminale in VS Code, ti attiva lo .venv in automatico.
-}
